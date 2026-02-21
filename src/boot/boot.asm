@@ -40,6 +40,7 @@ extern StartKernel
 
 start:
     mov esp, stack_top ; Set the stack pointer
+    
     ; Now that we have a stack, we can jump to C++ code
     jmp StartKernel ; Jump to the kernel
     hlt

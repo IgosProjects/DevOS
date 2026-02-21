@@ -8,13 +8,8 @@
  * that apply to this repository.
 */
 
-#pragma once
+// This file defines PIC functions and utilities
 
-// VGA driver class
-class VGA {
-    private:
- 
-    public:
-        static void PrintCharacter(const char Character);
-        static void PrintString(const char* String);
-};
+// Remap the PIC
+// REQUIRED!! Needed or else IRQs will overlap with CPU exceptions
+void RemapPIC();

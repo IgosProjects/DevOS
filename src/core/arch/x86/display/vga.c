@@ -8,8 +8,10 @@
  * that apply to this repository.
 */
 
+// This is the VGA driver, it lets you display stuff on the screen!! It is very simple and doesnt implement anything other than VGA text mode
+
 #include <stdint.h>
-#include <drivers/vga.hpp>
+#include <drivers/vga.h>
 
 uint8_t CursorX = 0;
 uint8_t CursorY = 0;
@@ -22,17 +24,19 @@ uint16_t VGAWidth  = 80;
 uint16_t VGAHeight = 25;
 
 // Prints a single character to the screen
-void VGA::PrintCharacter(const char Character) {
+void PrintCharacter(const char Character) {
     if (Character == '\n') {
         CursorX = 0;
         CursorY++; // Move down a line
+
+        return; // FIX: Return instead of printing the symbol
     };
 
     VGABuffer[CursorY * VGAWidth + CursorX] = (CurrentVGAColor << 8) | Character;
     CursorX++; // Move one row forward
 }
 
-void VGA::PrintString(const char* String) {
+void PrintString(const char* String) {
     while (*String) {
         PrintCharacter(*String++); // Loop until null terminate
     }

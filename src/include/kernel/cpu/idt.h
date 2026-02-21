@@ -8,6 +8,17 @@
  * that apply to this repository.
 */
 
-extern "C" void StartKernel() {
-    asm volatile("hlt");
-}
+// This file defines functions in "idt.c"
+
+#pragma once
+
+#include <stdint.h>
+
+// Setup the IDT for use
+void InitIDT();
+
+// Change a entry in the IDT table
+void SetIDTEntry(int index, uint32_t handler);
+
+// Load the current IDT
+void LoadIDT();

@@ -12,11 +12,11 @@ HOSTCC = cc
 include build.cfg # Include the configuration file
 
 # Get all the sources
-CPPSOURCES = $(wildcard src/core/*.cpp)
-ASMSOURCES = $(wildcard src/boot/*.asm)
+CSOURCES = $(wildcard src/core/*.c src/core/arch/$(TARGETARCH)/*/*.c src/drivers/*/*.c) # Driver files are all 2 directories deep
+ASMSOURCES = $(wildcard src/boot/*.asm src/core/arch/$(TARGETARCH)/*/*.asm src/drivers/*/*.asm)
 
 # Convert it into objects
-CPPOBJS = $(CPPSOURCES:.cpp=.cpp.o)
+COBJS = $(CSOURCES:.c=.c.o)
 ASMOBJS = $(ASMSOURCES:.asm=.asm.o)
 
 all: $(ISO)
@@ -26,16 +26,21 @@ all: $(ISO)
 	@echo "AS		$<"
 	@$(KERNELAS) $(ASFLAGS) $< -o $@
 
-%.cpp.o: %.cpp
-	@echo "CXX		$<"
-	@$(KERNELCXX) $(CFLAGS) -c $< -o $@
+%.c.o: %.c
+	@echo "CC		$<"
+	@$(KERNELCC) $(CFLAGS) -c $< -o $@
 
 # Link into an ELF
-$(ELF): $(CPPOBJS) $(ASMOBJS)
-	$(KERNELLD) $(LDFLAGS) $^ -o $@
+$(ELF): $(COBJS) $(ASMOBJS)
+	@echo "LD		$@"
+	@$(KERNELLD) $(LDFLAGS) $(COBJS) $(ASMOBJS) -o $@
 
+# Create an ISO
 $(ISO): $(ELF)
-	mkdir -p build/iso/boot/grub
-	cp grub.cfg build/iso/boot/grub
-	cp $(ELF) build/iso/boot
-	grub-mkrescue build/iso -o $(ISO)
+	@mkdir -p build/iso/boot/grub
+	@cp grub.cfg build/iso/boot/grub
+	@cp $(ELF) build/iso/boot
+	@grub-mkrescue build/iso -o $(ISO)
+
+clean:
+	@rm -rf $(COBJS) $(ASMOBJS) $(ISO) $(ELF)

@@ -1,6 +1,8 @@
 # Build artifacts
 
-**.*.o
+**.asm.o
+**.c.o
 *.iso
 *.elf 
-*.bin 
+*.bin
+*.log
