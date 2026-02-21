@@ -5,7 +5,7 @@
 ![Stars](https://img.shields.io/github/stars/IgosProjects/DevOS)
 ![Forks](https://img.shields.io/github/forks/IgosProjects/DevOS) 
 
-DevOS is a small educational OS, it is written in C++ and the Assembly language. DevOS is highly experminatal and doesnt have much to it!!
+DevOS is a small educational OS, it is written in C and the Assembly language. DevOS is highly experminatal and doesnt have much to it!!
 
 ## How do i build it?
 
