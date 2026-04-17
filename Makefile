@@ -33,7 +33,7 @@ all: $(ISO)
 # Link into an ELF
 $(ELF): $(COBJS) $(ASMOBJS)
 	@echo "LD		$@"
-	@$(KERNELLD) $(LDFLAGS) $(COBJS) $(ASMOBJS) -o $@
+	$(KERNELLD) $(LDFLAGS) $(COBJS) $(ASMOBJS) -o $@
 
 # Create an ISO
 $(ISO): $(ELF)

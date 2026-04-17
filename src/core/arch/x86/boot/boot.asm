@@ -7,8 +7,8 @@
 ; * that apply to this repository.
 
 ; This is boot.asm, it is ran AFTER grub loads and runs our kernel
-; In here we define a multiboot2 header and setup a stack(this is important as C++ uses the stack heavly)
-; After that we jump to C++
+; In here we define a multiboot2 header and setup a stack(this is important as C uses the stack heavly)
+; After that we jump to C
 
 [BITS 32] ; We are in 32 bit protected mode
 
@@ -37,13 +37,34 @@ section .text ; Now lets get onto the fun part.. CODING!!
 global start ; This will let GRUB see our start function
 
 extern StartKernel
+extern Halt ; Defined in "cpu.asm"
+extern GDTDescriptor ; Defined in "gdt.asm"
+extern CODE_SEG
 
 start:
+    cli ; Disable interrupts(prevent them from firing so we dont crash)
+
+    lgdt [GDTDescriptor] ; Load GDT
+    jmp CODE_SEG:.flush_cs
+
+; NOTE: This function is just used to set CS afterwards, dont remove it!
+; We do a far jump for a reason
+.flush_cs:
     mov esp, stack_top ; Set the stack pointer
+
+    mov ax, 0x10
+    mov ss, ax
+    mov ds, ax
+    mov es, ax
+    mov fs, ax
+    mov gs, ax
+
+    ; Now that we have a stack, we can jump to C code
+    call StartKernel ; Jump to the kernel
     
-    ; Now that we have a stack, we can jump to C++ code
-    jmp StartKernel ; Jump to the kernel
-    hlt
+    ; If kernel returns halt forever
+    call Halt
+    
 
 ; BSS is uninitilized memory
 ; We can use it to store stuff

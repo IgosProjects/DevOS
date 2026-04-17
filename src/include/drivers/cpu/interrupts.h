@@ -10,5 +10,13 @@
 
 // This file holds function blueprints for the interrupt subsystem
 
+#include <stdint.h>
+
+// Registers defined as a struct
+typedef struct {
+    uint32_t int_no;
+    uint32_t err_code;
+} registers_t;
+
 // Setup interrupts
 void InitInterrupts();

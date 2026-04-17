@@ -8,18 +8,50 @@
  * that apply to this repository.
 */
 
-// This file handles interrupts and other stuff
-// It uses the "pic.c" and "idt.c" files to work correctly!!
+// This file handles the C side of interrupts
 
-#include <kernel/cpu/idt.h>
-#include <kernel/cpu/pic.h>
-#include <kernel/cpu/cpu.asm.h>
+#include <drivers/cpu/cpu.asm.h>
+#include <drivers/cpu/pic.h>
+#include <drivers/cpu/interrupts.h>
+#include <drivers/cpu/idt.h>
+#include <drivers/vga.h>
+#include <drivers/input/keyboard.h>
+
+#include <assembly/ports.h>
+#include <kernel/panic.h>
+#include <kernel/devos.h>
+
+void ISRHandler(uint32_t int_no, uint32_t err_code) {
+    // Since CPU exceptions are critical, we kernel panic
+
+    char NumberOutputBuffer[512];
+    char OutputBuffer[512];
+    NumToString(int_no, NumberOutputBuffer); // Interrupt number
+    Join2Strings("CPU EXCEPTION: ", NumberOutputBuffer, OutputBuffer);
+    KernelPanic(OutputBuffer);
+}
+
+void IRQHandler(uint32_t int_no, uint32_t err_code) {
+    // Print the IRQ
+
+    // Keyboard interrupt
+    if (int_no == 33) {
+        OnKeyPress(int_no);
+    }
+    
+
+    // If the interrupt came from the slave PIC
+    if (int_no >= 40) {
+        outb(0xA0, 0x20);
+    }
+
+    // Always send EOI to master PIC
+    outb(0x20, 0x20);
+}
 
 void InitInterrupts() {
-    RemapPIC(); // Remap the PIC, see "https://wiki.osdev.org/8259_PIC" for more info
-    InitIDT(); // Initilize the Interrupt Descriptor Table
-
-    SetIDTEntry(0, (uint32_t)GenericISRHandler); // Interrupt 0 is "Divide By Zero"
-
+    InitIDT();
+    RemapPIC();
     LoadIDT();
+    asm volatile("sti"); // Turn on interrupts
 }

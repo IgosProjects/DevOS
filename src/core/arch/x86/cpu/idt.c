@@ -15,7 +15,7 @@
 
 #include <stdint.h>
 #include <kernel/devos.h>
-#include <kernel/cpu/cpu.asm.h>
+#include <drivers/cpu/cpu.asm.h>
 
 // An 32 bit IDT entry looks like this
 typedef struct __attribute__((packed)) IDTEntry {
@@ -32,31 +32,83 @@ typedef struct __attribute__((packed)) IDTPtr {
     uint32_t base; // Address of first entry
 } IDTPtr;
 
-IDTEntry IDTTable[256]; // Create a IDT table with 256 entries
-IDTPtr IDTPointer; // Pointer to the IDT table
+// The IDT table holds 256 entries
+IDTEntry IDTTable[256];
+IDTPtr IDTTablePointer;
 
-// Set an IDT table entry
-void SetIDTEntry(int index, uint32_t handler) {
+void UpdateTablePointer() {
+    IDTTablePointer.limit = sizeof(IDTEntry) * 256 - 1; // Set the limit(size of IDT table - 1)
+    IDTTablePointer.base = (uint32_t)&IDTTable[0]; // Address of first entry
+}
+
+void EditIDTEntry(int index, uint32_t handler) {
     IDTTable[index].offset_high = High16(handler);
-    IDTTable[index].selector = 0x8;
-    IDTTable[index].type_attr = 0x8E; // Example flags and type
+    IDTTable[index].selector = 0x08; // Kernel code selector in GDT
+    IDTTable[index].type_attr = 0x8E; // Generic flags
     IDTTable[index].zero = 0; // Allways meant to be zero
     IDTTable[index].offset_low = Low16(handler);
 }
 
-// Setup the IDT
+// Initilizes the IDT subsystem 
 void InitIDT() {
-    // Setup entries
-    SetIDTEntry(0, (uint32_t)GenericISRHandler);
-    SetIDTEntry(32, (uint32_t)GenericISRHandler); // Timer IRQ
+    UpdateTablePointer();
+    
+    EditIDTEntry(0, (uint32_t)isr0);
+    EditIDTEntry(1, (uint32_t)isr1);
+    EditIDTEntry(2, (uint32_t)isr2);
+    EditIDTEntry(3, (uint32_t)isr3);
+    EditIDTEntry(4, (uint32_t)isr4);
+    EditIDTEntry(5, (uint32_t)isr5);
+    EditIDTEntry(6, (uint32_t)isr6);
+    EditIDTEntry(7, (uint32_t)isr7);
+    EditIDTEntry(8, (uint32_t)isr8);
+    EditIDTEntry(9, (uint32_t)isr9);
+    EditIDTEntry(10, (uint32_t)isr10);
+    EditIDTEntry(11, (uint32_t)isr11);
+    EditIDTEntry(12, (uint32_t)isr12);
+    EditIDTEntry(13, (uint32_t)isr13);
+    EditIDTEntry(14, (uint32_t)isr14);
+    EditIDTEntry(15, (uint32_t)isr15);
+    EditIDTEntry(16, (uint32_t)isr16);
+    EditIDTEntry(17, (uint32_t)isr17);
+    EditIDTEntry(18, (uint32_t)isr18);
+    EditIDTEntry(19, (uint32_t)isr19);
+    EditIDTEntry(20, (uint32_t)isr20);
+    EditIDTEntry(21, (uint32_t)isr21);
+    EditIDTEntry(22, (uint32_t)isr22);
+    EditIDTEntry(23, (uint32_t)isr23);
+    EditIDTEntry(24, (uint32_t)isr24);
+    EditIDTEntry(25, (uint32_t)isr25);
+    EditIDTEntry(26, (uint32_t)isr26);
+    EditIDTEntry(27, (uint32_t)isr27);
+    EditIDTEntry(28, (uint32_t)isr28);
+    EditIDTEntry(29, (uint32_t)isr29);
+    EditIDTEntry(30, (uint32_t)isr30);
+    EditIDTEntry(31, (uint32_t)isr31);
+
+    // Now set the IRQs
+    EditIDTEntry(32, (uint32_t)irq0);
+    EditIDTEntry(33, (uint32_t)irq1);
+    EditIDTEntry(34, (uint32_t)irq2);
+    EditIDTEntry(35, (uint32_t)irq3);
+    EditIDTEntry(36, (uint32_t)irq4);
+    EditIDTEntry(37, (uint32_t)irq5);
+    EditIDTEntry(38, (uint32_t)irq6);
+    EditIDTEntry(39, (uint32_t)irq7);
+    EditIDTEntry(40, (uint32_t)irq8);
+    EditIDTEntry(41, (uint32_t)irq9);
+    EditIDTEntry(42, (uint32_t)irq10);
+    EditIDTEntry(43, (uint32_t)irq11);
+    EditIDTEntry(44, (uint32_t)irq12);
+    EditIDTEntry(45, (uint32_t)irq13);
+    EditIDTEntry(46, (uint32_t)irq14);
+    EditIDTEntry(47, (uint32_t)irq15);
 }
 
+// Loads a new IDT
 void LoadIDT() {
-    // Update IDTPointer(moved due to size being 0 originally)
-    IDTPointer.base = (uint32_t)&IDTTable;
-    IDTPointer.limit = 256 * sizeof(IDTEntry) - 1;
+    UpdateTablePointer(); // Update so size can be recalculated
 
-    // Simple hardcode to debug issue
-    asm volatile("lidt (%0)" : : "r" (&IDTPointer));
-    // LoadNewIDT(&IDTPointer);
+    //LoadNewIDT((uint32_t)&IDTTablePointer);
+    asm volatile("lidt (%0)" : : "r" (&IDTTablePointer));
 }

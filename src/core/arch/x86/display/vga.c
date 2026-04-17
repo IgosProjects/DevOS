@@ -12,6 +12,7 @@
 
 #include <stdint.h>
 #include <drivers/vga.h>
+#include <assembly/ports.h>
 
 uint8_t CursorX = 0;
 uint8_t CursorY = 0;
@@ -22,6 +23,16 @@ uint8_t CurrentVGAColor = 0x0F;
 
 uint16_t VGAWidth  = 80;
 uint16_t VGAHeight = 25;
+
+// Move the cursor to a certain X and Y value
+void UpdateVGACursor(int x, int y) {
+	uint16_t position = y * VGAWidth + x;
+
+	outb(0x3D4, 0x0F);
+	outb(0x3D5, (uint8_t) (position & 0xFF));
+	outb(0x3D4, 0x0E);
+	outb(0x3D5, (uint8_t) ((position >> 8) & 0xFF));
+}
 
 // Prints a single character to the screen
 void PrintCharacter(const char Character) {
@@ -36,8 +47,50 @@ void PrintCharacter(const char Character) {
     CursorX++; // Move one row forward
 }
 
+void ClearScreen() {
+    int counter1 = 0;
+    int counter2 = 0;
+
+    // Loop thru each coloum
+    while (!counter1 == VGAHeight) {
+        // Loop thru each characther
+        while (!counter2 == VGAWidth) {
+            PrintCharacter('H');
+        }
+    }
+
+    // Now we reset the cursor(to prevent writing off screen)
+    CursorX = 0;
+    CursorY = 0;
+    UpdateVGACursor(0, 0);
+}
+
 void PrintString(const char* String) {
     while (*String) {
         PrintCharacter(*String++); // Loop until null terminate
     }
+
+    // Update the cursor
+    UpdateVGACursor(CursorX, CursorY);
+}
+
+char* NumToString(uint32_t number, char Buffer[]) {
+    int i = 10; // index
+    Buffer[i] = '\0';
+    if (number == 0) {
+        Buffer[--i] = '0';
+    } else {
+        while(number > 0) {
+            Buffer[--i] = '0' + (number % 10);
+            number /= 10;
+        }
+    }
+    
+    return Buffer;
+}
+
+void PrintNumber(uint32_t number) {
+    char OutputBuffer[100];
+    NumToString(number, OutputBuffer);
+    PrintString(OutputBuffer);
 }
