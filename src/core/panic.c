@@ -26,6 +26,7 @@ void KernelPanic(const char* reason) {
     
     PrintString("Kernel version: "  DEVOS_VER);
     PrintString("\nKernel build date: "  DEVOS_BUILDTIME);
+    PrintString("\nReason: ");
     PrintString(reason);
     PrintString("\n\n----------PANIC END----------\n");
     

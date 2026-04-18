@@ -23,12 +23,7 @@
 
 void ISRHandler(uint32_t int_no, uint32_t err_code) {
     // Since CPU exceptions are critical, we kernel panic
-
-    char NumberOutputBuffer[512];
-    char OutputBuffer[512];
-    NumToString(int_no, NumberOutputBuffer); // Interrupt number
-    Join2Strings("CPU EXCEPTION: ", NumberOutputBuffer, OutputBuffer);
-    KernelPanic(OutputBuffer);
+    KernelPanic("what the fuck, oh yeah sorry old logic didnt work");
 }
 
 void IRQHandler(uint32_t int_no, uint32_t err_code) {

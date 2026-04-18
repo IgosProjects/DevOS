@@ -43,6 +43,12 @@ bool Capslock = false;
 char CommandBuffer[256];
 int BufferIndex = 0;
 
+void ClearCommandBuffer() {
+	for (int i = 0; i < 512; i++) {
+    	CommandBuffer[i] = 0;
+	}
+}
+
 void OnKeyPress(uint32_t int_no) {
 	uint8_t Scancode = inb(0x60); // Read scancode from port
 
@@ -67,8 +73,10 @@ void OnKeyPress(uint32_t int_no) {
 
 	if (Scancode == ENTER) {
 		// When enter is pressed we need to execute the command
-		CommandBuffer[0] = '\0'; // NOTE: This is a temporary workaround, replace it later!
+		CommandBuffer[BufferIndex + 1] = '\0'; // Add null terminator
 		ExecuteCommand(CommandBuffer);
+
+		ClearCommandBuffer();
 		return;
 	}
 

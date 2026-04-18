@@ -19,26 +19,40 @@
 
 #include <kernel/devos.h>
 #include <kernel/panic.h>
-#include <drivers/cpu/cpu.asm.h>
+#include <kernel/mem.h>
 
+#include <drivers/cpu/cpu.asm.h>
 #include <drivers/vga.h>
 #include <drivers/cpu/interrupts.h>
 #include <drivers/printf/tinyprintf.h>
+#include <drivers/audio/pcspeaker.h>
+
+void RunTests() {
+
+    // Test the memory allocation
+    PrintString("Testing kmalloc!\n");
+    void* AllocatedSpace = kmalloc(1048576); // Allocate a MB of memory
+    if (AllocatedSpace) {
+        PrintString("OK!\n");
+    } else {
+        KernelPanic("Failed to allocate memory");
+    }
+}
 
 // This is the kernel entry function
 void StartKernel() {
     // Inside of it is where our boot file(boot.asm) calls C
     // Now that we have C we can do many thing we chouldnt before!!
 
-
     // Initilize all systems
-    init_printf(PrintCharacter, 0);
     InitInterrupts();
 
-    int counter = 0;
-    int counter2 = 0;
+    // Run kernel tests
+    RunTests();
 
-    // TODO: Add shell
+    // Beep on boot
+    Beep();
+
     PrintString("\n>");
 
     while (1) {
@@ -46,21 +60,46 @@ void StartKernel() {
     }
 }
 
-/* K&R
- * Returns <0 if s1<s2, 0 if s1==s2, >0 if s1>s2 */
-int CompareString(char s1[], char s2[]) {
-    int i;
-    for (i = 0; s1[i] == s2[i]; i++) {
-        if (s1[i] == '\0') return 0;
+int CompareString(const char *s1, const char *s2) {
+    int i = 0;
+
+    while (s1[i] != '\0' && s2[i] != '\0') {
+        char c1 = s1[i];
+        char c2 = s2[i];
+
+        // Convert to lowercase
+        if (c1 >= 'A' && c1 <= 'Z') c1 += 32;
+        if (c2 >= 'A' && c2 <= 'Z') c2 += 32;
+
+        if (c1 != c2)
+            return (unsigned char)c1 - (unsigned char)c2;
+
+        i++;
     }
-    return s1[i] - s2[i];
+
+    // Handle end of string
+    char c1 = s1[i];
+    char c2 = s2[i];
+
+    if (c1 >= 'A' && c1 <= 'Z') c1 += 32;
+    if (c2 >= 'A' && c2 <= 'Z') c2 += 32;
+
+    return (unsigned char)c1 - (unsigned char)c2;
 }
 
 void ExecuteCommand(char* Command) {
     if (CompareString(Command, "HI") == 0) {
-        PrintString("Hi!\n");
+        PrintString("\nHi!");
+    } else if (CompareString(Command, "EXIT") == 0) {
+        PrintString("\nStopping the CPU, BYE!");
+        Halt(); // Halt the CPU
+    } else if (CompareString(Command, "HELP") == 0) {
+        PrintString("\nHelp menu:");
+        PrintString("\n    EXIT: Stops the CPU");
+        PrintString("\n    HI: Prints Hi!");
     } else {
         PrintString("Invalid command!\n");
-        PrintString(">");
     }
+
+    PrintString("\n>");
 }
