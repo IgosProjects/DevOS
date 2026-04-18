@@ -18,6 +18,6 @@ Now we have all the tools! Lets get to building.
 
 Once you have cloned the repo and have all the files you can run the ```$ make``` command to build the OS.
 It will then give you an ISO file, we can run that ISO file by running the command: ```$ qemu-system-i386 -cdrom DevOS.iso```. That will open a QEMU window with GRUB the bootloader in it.
-(QEMU window with GRUB in it)[assets/grub-1.png]
+!(QEMU window with GRUB in it)[assets/grub-1.png]
 
 It will actually autoboot in 1 second by defualt, if it doenst press the enter key, then you should see the shell. Now you have built DevOS! Congrats!
