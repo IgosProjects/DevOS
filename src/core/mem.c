@@ -19,7 +19,7 @@
 #include <kernel/panic.h>
 
 const uint32_t HeapStart = 0x01000000; // Right above 1MB(where we are loaded)
-const uintptr_t HeapEnd = 0x08000000; // Where the memory heap should end(no allocations can be made)
+const uintptr_t HeapEnd = 0x02000000; // Where the memory heap should end(no allocations can be made)
 uintptr_t NextFree = HeapStart; // Pointer to next free memory
 
 // Allocates a certain amount of bytes, and returns the pointer to the start

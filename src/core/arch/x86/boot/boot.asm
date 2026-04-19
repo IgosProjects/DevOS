@@ -52,6 +52,8 @@ start:
 .flush_cs:
     mov esp, stack_top ; Set the stack pointer
 
+    mov edi, eax ; Store EAX for later
+
     mov ax, 0x10
     mov ss, ax
     mov ds, ax
@@ -59,6 +61,8 @@ start:
     mov fs, ax
     mov gs, ax
 
+    push ebx ; Push magic number
+    push edi ; Push info pointer
     ; Now that we have a stack, we can jump to C code
     call StartKernel ; Jump to the kernel
     

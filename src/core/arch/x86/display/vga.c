@@ -24,6 +24,23 @@ uint8_t CurrentVGAColor = 0x0F;
 uint16_t VGAWidth  = 80;
 uint16_t VGAHeight = 25;
 
+void Scroll() {
+    // Move every row up by one
+    for (int y = 0; y < VGAHeight - 1; y++) {
+        for (int x = 0; x < VGAWidth; x++) {
+            VGABuffer[y * VGAWidth + x] = VGABuffer[(y + 1) * VGAWidth + x];
+        }
+    }
+
+    // Clear the bottom row
+    for (int x = 0; x < VGAWidth; x++) {
+        VGABuffer[(VGAHeight - 1) * VGAWidth + x] = (CurrentVGAColor << 8) | ' ';
+    }
+
+    // Keep cursor on last line
+    CursorY = VGAHeight - 1;
+}
+
 // Move the cursor to a certain X and Y value
 void UpdateVGACursor(int x, int y) {
 	uint16_t position = y * VGAWidth + x;
@@ -39,6 +56,8 @@ void PrintCharacter(const char Character) {
     if (Character == '\n') {
         CursorX = 0;
         CursorY++; // Move down a line
+
+        if (CursorY >= VGAHeight) Scroll();
 
         return; // FIX: Return instead of printing the symbol
     };

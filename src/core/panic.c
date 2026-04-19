@@ -12,7 +12,6 @@
 // It prints debug info and stuff
 
 #include <drivers/vga.h>
-#include <drivers/printf/tinyprintf.h>
 #include <drivers/cpu/cpu.asm.h>
 #include <kernel/devos.h>
 
