@@ -27,6 +27,7 @@
 #include <drivers/vga.h>
 #include <drivers/cpu/interrupts.h>
 #include <drivers/audio/pcspeaker.h>
+#include <drivers/debug/serial.h>
 
 void RunTests() {
 
@@ -63,6 +64,7 @@ void StartKernel(uint32_t magic, uint32_t addr) {
 
     // Initilize all systems
     InitInterrupts();
+    InitSerial();
 
     // Run kernel tests
     RunTests();
@@ -123,7 +125,7 @@ void ExecuteCommand(char* Command) {
         PrintString("\n    EXIT: Stops the CPU");
         PrintString("\n    HI: Prints Hi!");
         PrintString("\n    VER: Prints OS info");
-        PrintString("\n    MBINFO: Shows multiboot info")
+        PrintString("\n    MBINFO: Shows multiboot info");
     } else if (CompareString(Command, "VER") == 0) {
         PrintCharacter('\n'); // Print a newline
         PrintString("DevOS "  DEVOS_VER);

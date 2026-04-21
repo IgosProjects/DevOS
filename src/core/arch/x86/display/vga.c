@@ -13,6 +13,7 @@
 #include <stdint.h>
 #include <drivers/vga.h>
 #include <assembly/ports.h>
+#include <drivers/debug/serial.h>
 
 uint8_t CursorX = 0;
 uint8_t CursorY = 0;
@@ -53,17 +54,24 @@ void UpdateVGACursor(int x, int y) {
 
 // Prints a single character to the screen
 void PrintCharacter(const char Character) {
+    WriteSerialChar(Character);
     if (Character == '\n') {
         CursorX = 0;
         CursorY++; // Move down a line
 
-        if (CursorY >= VGAHeight) Scroll();
+        if (CursorY >= VGAHeight) Scroll(); // Scroll if reached bottom
 
         return; // FIX: Return instead of printing the symbol
     };
 
     VGABuffer[CursorY * VGAWidth + CursorX] = (CurrentVGAColor << 8) | Character;
     CursorX++; // Move one row forward
+
+    if (CursorX >= VGAWidth) {
+        CursorX = 0;
+        CursorY++;
+        if (CursorY >= VGAHeight) Scroll(); // Scroll if reached bottom
+    }
 }
 
 void ClearScreen() {

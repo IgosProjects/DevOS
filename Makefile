@@ -42,5 +42,8 @@ $(ISO): $(ELF)
 	@cp $(ELF) build/iso/boot
 	@grub-mkrescue build/iso -o $(ISO)
 
+find:
+	./a.out $(shell find .)
+
 clean:
 	@rm -rf $(COBJS) $(ASMOBJS) $(ISO) $(ELF)
