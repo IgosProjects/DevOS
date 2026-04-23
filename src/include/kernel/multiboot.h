@@ -9,9 +9,10 @@
 */
 
 #pragma once
+#include <drivers/display/fb.h>
 
 // Parses the multiboot info, and handles the values
-void ParseMultibootInfo(unsigned long addr);
+void ParseMultibootInfo(unsigned long addr, framebuffer_t* framebuffer);
 
 // Returns an array of tags
 char** GetMultibootTags();

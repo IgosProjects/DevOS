@@ -27,7 +27,18 @@ HeaderStart:
     ; Since multiboot2 uses tags to reqest framebuffer and such, we need a end tag.
     ; A end tag is used so GRUB doesnt read unallocated memory
 
+    ; Framebuffer request type
+    align 8
+    dw 5 ; Type
+    dw 0 ; Flags
+    dd 20 ; Size
+
+    dd 0 ; Width(0 = any)
+    dd 0 ; Height
+    dd 32 ; Depth(bits per pixel)
+
     ; End tag
+    align 8
     dw 0    ; Type
     dw 0    ; Flags
     dd 8    ; Size

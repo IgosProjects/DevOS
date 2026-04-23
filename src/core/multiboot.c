@@ -9,6 +9,8 @@
 */
 
 #include <kernel/util/multiboot2.h>
+#include <kernel/multiboot.h>
+#include <drivers/display/fb.h>
 #include <drivers/vga.h>
 #include <stdint.h>
 
@@ -16,7 +18,7 @@ char* TagArray[512]; // Create an array to store the tags
 uint32_t TagArrayIndex = 0; 
 
 // Parses the multiboot info, and handles the values
-void ParseMultibootInfo(unsigned long addr) {
+void ParseMultibootInfo(unsigned long addr, framebuffer_t* framebuffer) {
 	uint8_t* pointer = (uint8_t*)addr + 8; // Pointer after 8 bytes of Multiboot addr
 
 	// Loop thru all tags
@@ -28,7 +30,26 @@ void ParseMultibootInfo(unsigned long addr) {
             TagArray[TagArrayIndex++] = "MODULE\n"; // Append to tag list
         } else if (tag->type == MULTIBOOT_TAG_TYPE_MMAP) {
             TagArray[TagArrayIndex++] = "MEMORY MAP\n"; 
-        } else if (tag->type == MULTIBOOT_TAG_TYPE_CMDLINE) {
+        } else if (tag->type == MULTIBOOT_TAG_TYPE_FRAMEBUFFER) {
+            TagArray[TagArrayIndex++] = "FRAMEBUFFER\n";
+            struct multiboot_tag_framebuffer* FramebufferTag = (struct multiboot_tag_framebuffer*)tag;
+
+            // Fill out framebuffer info
+            framebuffer->Addr = FramebufferTag->common.framebuffer_addr;
+            framebuffer->SizeX = FramebufferTag->common.framebuffer_width;
+            framebuffer->SizeY = FramebufferTag->common.framebuffer_height;
+            framebuffer->Pitch = FramebufferTag->common.framebuffer_pitch;
+            framebuffer->BPP = FramebufferTag->common.framebuffer_bpp;
+            
+            framebuffer->RedOffset = FramebufferTag->framebuffer_red_field_position;
+            framebuffer->RedSize = FramebufferTag->framebuffer_red_mask_size;
+            
+            framebuffer->GreenOffset = FramebufferTag->framebuffer_green_field_position;
+            framebuffer->GreenSize = FramebufferTag->framebuffer_green_mask_size;
+        
+            framebuffer->BlueOffset = FramebufferTag->framebuffer_blue_field_position;
+            framebuffer->BlueSize = FramebufferTag->framebuffer_blue_mask_size;
+        }  else if (tag->type == MULTIBOOT_TAG_TYPE_CMDLINE) {
             TagArray[TagArrayIndex++] = "COMMAND LINE\n";
         } else if (tag->type == MULTIBOOT_TAG_TYPE_BASIC_MEMINFO) {
             TagArray[TagArrayIndex++] = "BASIC MEMINFO\n";

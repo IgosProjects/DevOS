@@ -23,11 +23,14 @@
 #include <kernel/util/multiboot2.h>
 #include <kernel/multiboot.h>
 
+#include <drivers/display/fb.h>
 #include <drivers/cpu/cpu.asm.h>
 #include <drivers/vga.h>
 #include <drivers/cpu/interrupts.h>
 #include <drivers/audio/pcspeaker.h>
 #include <drivers/debug/serial.h>
+
+framebuffer_t Framebuffer;
 
 void RunTests() {
 
@@ -60,11 +63,12 @@ void StartKernel(uint32_t magic, uint32_t addr) {
         KernelPanic("MBI not aligned");
     }
 
-    ParseMultibootInfo(addr);
+    ParseMultibootInfo(addr, &Framebuffer); // Pass address and framebuffer
 
     // Initilize all systems
     InitInterrupts();
     InitSerial();
+    InitFB(&Framebuffer);
 
     // Run kernel tests
     RunTests();
@@ -112,6 +116,8 @@ void ExecuteCommand(char* Command) {
     } else if (CompareString(Command, "EXIT") == 0) {
         PrintString("\nStopping the CPU, BYE!");
         Halt(); // Halt the CPU
+    } else if (CompareString(Command, "CLEAR") == 0) {
+        ClearScreen(); // Clear the screen
     } else if (CompareString(Command, "MBINFO") == 0) {
         PrintString("\nMultiboot info: \n");
         char** TagArray = GetMultibootTags();

@@ -36,7 +36,7 @@ $(ELF): $(COBJS) $(ASMOBJS)
 	$(KERNELLD) $(LDFLAGS) $(COBJS) $(ASMOBJS) -o $@
 
 # Create an ISO
-$(ISO): $(ELF)
+$(ISO): $(ELF) grub.cfg
 	@mkdir -p build/iso/boot/grub
 	@cp grub.cfg build/iso/boot/grub
 	@cp $(ELF) build/iso/boot
