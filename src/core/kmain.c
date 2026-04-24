@@ -132,11 +132,18 @@ void ExecuteCommand(char* Command) {
         PrintString("\n    HI: Prints Hi!");
         PrintString("\n    VER: Prints OS info");
         PrintString("\n    MBINFO: Shows multiboot info");
+        PrintString("\n    CLEAR: Clears the screen");
     } else if (CompareString(Command, "VER") == 0) {
         PrintCharacter('\n'); // Print a newline
         PrintString("DevOS "  DEVOS_VER);
         PrintCharacter('\n'); // Print a newline
         PrintString("Build date: "  DEVOS_BUILDTIME);
+    } else if (CompareString(Command, "PANIC") == 0) {
+        KernelPanic("User initiated panic");
+    } else if (CompareString(Command, "DIVIDEBYZERO") == 0) {
+        int x = 0;
+        int y = 15;
+        int z = y / x;
     } else {
         PrintString("Invalid command!\n");
     }

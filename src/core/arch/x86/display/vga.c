@@ -9,6 +9,7 @@
 */
 
 // This is the VGA driver, it lets you display stuff on the screen!! It is very simple and doesnt implement anything other than VGA text mode
+// FUTURE ME: yes it does, as of 4/23/2026 it has framebuffer
 
 #include <stdint.h>
 #include <drivers/display/fb.h>

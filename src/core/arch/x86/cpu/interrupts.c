@@ -33,7 +33,6 @@ void IRQHandler(uint32_t int_no, uint32_t err_code) {
     if (int_no == 33) {
         OnKeyPress(int_no);
     }
-    
 
     // If the interrupt came from the slave PIC
     if (int_no >= 40) {

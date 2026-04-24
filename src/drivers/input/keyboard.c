@@ -13,6 +13,7 @@
 
 #include <assembly/ports.h>
 #include <drivers/vga.h>
+#include <drivers/display/fb.h>
 #include <kernel/devos.h>
 
 #include <stdint.h>
@@ -22,6 +23,7 @@
 #define SHIFT_DOWN 0x2A // Shift down keycode
 #define SHIFT_UP 0xAA // Shift up keycode
 #define ENTER 0x1C // Enter keycode
+#define BACKSPACE 0x0E // Backspace keycode
 
 // All the scancodes in QWERTY keyboard defined(uppercase)
 const char ScancodeASCIIUppercase[] = {'?', '?', '!', '"', '#', '$', '%', '&',
@@ -68,6 +70,17 @@ void OnKeyPress(uint32_t int_no) {
 		return;
 	} else if (Scancode == SHIFT_UP) {
 		Capslock = false; // Disable when raised
+		return;
+	}
+
+	if (Scancode == BACKSPACE) {
+		if (BufferIndex <= 0) return;
+
+		CommandBuffer[BufferIndex - 1] = ' '; // Set to space
+		FBPrintBackspace();
+
+		BufferIndex -= 1;
+
 		return;
 	}
 

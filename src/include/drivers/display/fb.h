@@ -37,11 +37,23 @@ typedef struct framebuffer_t {
 // Initilizes the framebuffer driver, and draws a test pixel
 void InitFB(framebuffer_t* FramebufferPointer);
 
+// Draws a pixel of any color, at any position
+void DrawPixel(uint32_t x, uint32_t y, uint8_t r, uint8_t g, uint8_t b);
+
 // Prints a single character to the framebuffer
 void FBPrintChar(char c, uint32_t scale);
 
 // Prints a string to framebuffer
 void FBPrintString(const char* String);
 
-// Clears the framebuffer screen to blacjk
+// Clears the framebuffer screen to black
 void FBClearScreen();
+
+// Clears the framebuffer screen to a specified color
+void FBClearScreenToColor(int r, int g, int b);
+
+// Prints a hex value to the screen
+void FBPrintHex(uint32_t value);
+
+// Removes the last character, and moves back the cursor
+void FBPrintBackspace();
