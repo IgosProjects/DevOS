@@ -10,6 +10,13 @@
 
 DevOS is a small educational OS, it is written in C and the Assembly language. DevOS is highly experminatal and doesnt have much to it!!
 
+Features:
+    1. Framebuffer
+    2. Keyboard
+    3. ATA(untested)
+    4. Interrupts
+    5. Multiboot2 parsing
+
 ## How do i build it?
 
 Building tutorial can be found in [building.md](building.md)!
