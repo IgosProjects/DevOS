@@ -12,3 +12,9 @@
 
 // Halt the CPU for a certain amount of ticks
 void delay(int ticks);
+
+// Compares two strings
+int CompareString(const char *s1, const char *s2);
+
+// Returns a random number, using the seed stored in kernel
+uint32_t GetRandomNumber();

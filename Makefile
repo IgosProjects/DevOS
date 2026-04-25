@@ -35,11 +35,16 @@ $(ELF): $(COBJS) $(ASMOBJS)
 	@echo "LD		$@"
 	$(KERNELLD) $(LDFLAGS) $(COBJS) $(ASMOBJS) -o $@
 
+$(INITFS): initramfs
+	@echo "CPIO		$@"
+	@cd initramfs && find . | cpio -o -H newc > ../$(INITFS)
+
 # Create an ISO
-$(ISO): $(ELF) grub.cfg
+$(ISO): $(ELF) $(INITFS) grub.cfg
 	@mkdir -p build/iso/boot/grub
 	@cp grub.cfg build/iso/boot/grub
 	@cp $(ELF) build/iso/boot
+	@cp $(INITFS) build/iso/boot
 	@grub-mkrescue build/iso -o $(ISO)
 
 find:

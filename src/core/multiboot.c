@@ -25,10 +25,7 @@ void ParseMultibootInfo(unsigned long addr, framebuffer_t* framebuffer) {
     while (1) {
         struct multiboot_tag* tag = (struct multiboot_tag*)pointer;
 
-        if (tag->type == MULTIBOOT_TAG_TYPE_MODULE) {
-        	PrintString("Found multiboot2 module!");
-            TagArray[TagArrayIndex++] = "MODULE\n"; // Append to tag list
-        } else if (tag->type == MULTIBOOT_TAG_TYPE_MMAP) {
+        if (tag->type == MULTIBOOT_TAG_TYPE_MMAP) {
             TagArray[TagArrayIndex++] = "MEMORY MAP\n"; 
         } else if (tag->type == MULTIBOOT_TAG_TYPE_FRAMEBUFFER) {
             TagArray[TagArrayIndex++] = "FRAMEBUFFER\n";

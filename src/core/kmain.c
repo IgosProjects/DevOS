@@ -21,6 +21,7 @@
 #include <kernel/panic.h>
 #include <kernel/mem.h>
 #include <kernel/util/multiboot2.h>
+#include <kernel/util.h>
 #include <kernel/multiboot.h>
 
 #include <drivers/display/fb.h>
@@ -31,6 +32,8 @@
 #include <drivers/debug/serial.h>
 
 framebuffer_t Framebuffer;
+
+char* BootBanner = "DevTerminal 1.0\nCopyright(c) 2026 EyeDev\n";
 
 void RunTests() {
 
@@ -75,39 +78,13 @@ void StartKernel(uint32_t magic, uint32_t addr) {
 
     // Beep on boot
     Beep();
-
+    
+    PrintString(BootBanner);
     PrintString("\n>");
 
     while (1) {
         asm volatile("hlt");
     }
-}
-
-int CompareString(const char *s1, const char *s2) {
-    int i = 0;
-
-    while (s1[i] != '\0' && s2[i] != '\0') {
-        char c1 = s1[i];
-        char c2 = s2[i];
-
-        // Convert to lowercase
-        if (c1 >= 'A' && c1 <= 'Z') c1 += 32;
-        if (c2 >= 'A' && c2 <= 'Z') c2 += 32;
-
-        if (c1 != c2)
-            return (unsigned char)c1 - (unsigned char)c2;
-
-        i++;
-    }
-
-    // Handle end of string
-    char c1 = s1[i];
-    char c2 = s2[i];
-
-    if (c1 >= 'A' && c1 <= 'Z') c1 += 32;
-    if (c2 >= 'A' && c2 <= 'Z') c2 += 32;
-
-    return (unsigned char)c1 - (unsigned char)c2;
 }
 
 void ExecuteCommand(char* Command) {
@@ -140,6 +117,10 @@ void ExecuteCommand(char* Command) {
         PrintString("Build date: "  DEVOS_BUILDTIME);
     } else if (CompareString(Command, "PANIC") == 0) {
         KernelPanic("User initiated panic");
+    } else if (CompareString(Command, "GARBLE") == 0) {
+        while (1) {
+            FBClearScreenToColor(GetRandomNumber(), GetRandomNumber(), GetRandomNumber());
+        }
     } else if (CompareString(Command, "DIVIDEBYZERO") == 0) {
         int x = 0;
         int y = 15;
